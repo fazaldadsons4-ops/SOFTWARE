@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Upload PDF{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7 col-md-9">
+
+    <div class="text-center mb-4">
+      <h2 class="fw-bold" style="color:var(--primary);">Distributor PDF Cleaner</h2>
+      <p class="text-muted">Upload a distributor sales statement. We'll extract the table,<br>
+        let you map columns, and export a clean Excel file.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-header py-3">
+        <i class="bi bi-cloud-arrow-up me-2"></i>Upload PDF Statement
+      </div>
+      <div class="card-body p-4">
+        <form action="{{ base_path }}/upload" method="post" enctype="multipart/form-data" id="upload-form">
+          <div class="drop-zone text-center p-5 mb-3" id="drop-zone"
+               onclick="document.getElementById('pdf_file').click()">
+            <i class="bi bi-file-earmark-pdf display-4 text-muted mb-3 d-block"></i>
+            <p class="mb-1 fw-semibold text-muted">Drag &amp; drop your PDF here</p>
+            <p class="text-muted small mb-3">or click to browse</p>
+            <input type="file" name="pdf_file" id="pdf_file" accept=".pdf" class="d-none" required>
+            <div id="file-info" class="d-none">
+              <span class="badge bg-success fs-6" id="file-name-badge">
+                <i class="bi bi-check-circle me-1"></i><span id="file-name-text"></span>
+              </span>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold" id="upload-btn">
+            <i class="bi bi-upload me-2"></i>Upload &amp; Extract Table
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- How it works -->
+    <div class="card mt-4">
+      <div class="card-header py-2" style="background:#2E75B6;">
+        <i class="bi bi-info-circle me-2"></i>How it works
+      </div>
+      <div class="card-body p-0">
+        <ol class="list-group list-group-flush list-group-numbered rounded-bottom">
+          {% for icon, step in [
+            ("cloud-arrow-up",       "Upload your distributor PDF statement"),
+            ("table",                "The app extracts all table data and shows a preview with column numbers"),
+            ("chat-left-text",       "Type simple commands — e.g. <code>Product column is 1, Net Sales column is 7</code>"),
+            ("file-earmark-excel",   "Download the clean Excel file with Product, Rate, and Net Sales columns"),
+          ] %}
+          <li class="list-group-item d-flex align-items-start gap-3 py-3">
+            <i class="bi bi-{{ icon }} mt-1 text-primary fs-5"></i>
+            <span>{{ step | safe }}</span>
+          </li>
+          {% endfor %}
+        </ol>
+      </div>
+    </div>
+
+    <!-- Example commands -->
+    <div class="card mt-3 border-0" style="background:#EBF3FB;">
+      <div class="card-body py-3">
+        <p class="fw-semibold small mb-2" style="color:var(--primary);">
+          <i class="bi bi-lightbulb me-1 text-warning"></i>Example column mapping commands:
+        </p>
+        <code class="small d-block text-muted">
+          Product column is 2<br>
+          Rate column is 4<br>
+          Net Sales column is 7
+        </code>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('pdf_file');
+const fileInfo  = document.getElementById('file-info');
+const fileNameT = document.getElementById('file-name-text');
+const uploadBtn = document.getElementById('upload-btn');
+
+function setFile(file) {
+  if (!file) return;
+  fileNameT.textContent = file.name;
+  fileInfo.classList.remove('d-none');
+}
+fileInput.addEventListener('change', () => setFile(fileInput.files[0]));
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', ()  => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file && file.name.endsWith('.pdf')) {
+    const dt = new DataTransfer(); dt.items.add(file);
+    fileInput.files = dt.files; setFile(file);
+  }
+});
+document.getElementById('upload-form').addEventListener('submit', () => {
+  uploadBtn.disabled = true;
+  uploadBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Extracting…';
+});
+</script>
+{% endblock %}
