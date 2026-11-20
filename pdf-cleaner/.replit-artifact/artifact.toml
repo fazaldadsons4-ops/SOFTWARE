@@ -1,0 +1,23 @@
+kind = "web"
+previewPath = "/pdf-cleaner/"
+title = "PDF Cleaner & Column Mapper"
+version = "1.0.0"
+id = "artifacts/pdf-cleaner"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = ["/pdf-cleaner/"]
+localPort = 23601
+
+[services.development]
+run = "cd /home/runner/workspace/artifacts/pdf-cleaner && python app.py"
+
+[services.env]
+PORT = "23601"
+BASE_PATH = "/pdf-cleaner"
+SESSION_SECRET = "<set via environment>"
