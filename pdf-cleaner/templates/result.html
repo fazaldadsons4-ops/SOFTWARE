@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Download — {{ filename }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-9">
+
+    <!-- Success banner -->
+    <div class="card mb-4" style="border-color:#28A745; background:#F0FFF4;">
+      <div class="card-body py-3 px-4 d-flex align-items-center justify-content-between gap-3 flex-wrap">
+        <div>
+          <p class="fw-bold mb-0" style="color:#155724; font-size:1.1rem;">
+            <i class="bi bi-check-circle-fill text-success me-2"></i>
+            Excel file generated successfully
+          </p>
+          <p class="text-muted small mb-0 mt-1">
+            <strong>{{ row_count }}</strong> rows extracted from
+            <strong>{{ pdf_filename }}</strong>
+          </p>
+        </div>
+        <a href="{{ base_path }}/download/{{ filename }}"
+           class="btn btn-success px-4 fw-semibold" id="download-btn">
+          <i class="bi bi-download me-2"></i>Download Excel
+        </a>
+      </div>
+    </div>
+
+    <!-- Column mapping summary -->
+    <div class="card mb-4">
+      <div class="card-header py-2" style="background:#2E75B6;">
+        <i class="bi bi-diagram-3 me-2"></i>Column Mapping Applied
+      </div>
+      <div class="card-body py-3">
+        <div class="row g-3">
+          {% set icons  = {'product':'box','rate':'currency-dollar','net_sales':'graph-up'} %}
+          {% set colors = {'product':'#1E3A5F','rate':'#2E75B6','net_sales':'#ED7D31'} %}
+          {% for field, col_num in mapping.items() %}
+          <div class="col-md-4">
+            <div class="p-3 rounded text-center" style="background:#F0F4FA; border:1px solid var(--border);">
+              <i class="bi bi-{{ icons.get(field,'columns') }} fs-4 mb-1 d-block"
+                 style="color:{{ colors.get(field,'#555') }};"></i>
+              <p class="fw-bold mb-0 text-capitalize">{{ field.replace('_',' ') }}</p>
+              <span class="badge rounded-pill mt-1"
+                    style="background:{{ colors.get(field,'#555') }}">
+                Column {{ col_num }}
+              </span>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Data preview -->
+    <div class="card mb-4">
+      <div class="card-header py-2">
+        <i class="bi bi-table me-2"></i>Data Preview (first 20 rows)
+      </div>
+      <div class="card-body p-0">
+        <div style="overflow-x:auto;">
+          {{ preview_html | safe }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="d-flex gap-3 flex-wrap">
+      <a href="{{ base_path }}/download/{{ filename }}"
+         class="btn btn-success px-4 fw-semibold">
+        <i class="bi bi-download me-2"></i>Download Excel
+      </a>
+      <a href="{{ base_path }}/preview" class="btn btn-outline-primary px-4">
+        <i class="bi bi-arrow-left me-2"></i>Back to Preview
+      </a>
+      <a href="{{ base_path }}/" class="btn btn-outline-secondary px-4">
+        <i class="bi bi-upload me-2"></i>Upload Another PDF
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+setTimeout(() => {
+  const btn = document.getElementById('download-btn');
+  if (btn) btn.click();
+}, 800);
+</script>
+{% endblock %}
